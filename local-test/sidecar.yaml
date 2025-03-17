@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: monitor
+  labels:
+    app: grafana
+spec:
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      serviceAccountName: grafana-sidecar-sa
+      containers:
+        - name: grafana
+          image: grafana/grafana:latest
+          env:
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              value: "prom-operator"
+        - name: grafana-service-accounts-sc
+          image: grafana-service-accounts-sidecar:local
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: GRAFANA_USERNAME
+              value: "admin"
+            - name: GRAFANA_PASSWORD
+              value: "prom-operator"
+            - name: GRAFANA_URL
+              value: "http://127.0.0.1:3000"
+            - name: K8S_NAMESPACE
+              value: "monitor"
+            - name: TOKEN_SECRET_NAME
+              value: "grafana-service-account-token"
+            - name: SERVICE_ACCOUNT_NAME
+              value: "Provisioned-SA"
+            - name: TOKEN_NAME
+              value: "token1"
+            - name: CHECK_INTERVAL_IN_S
+              value: "60"

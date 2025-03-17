@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: grafana-sidecar-sa
+  namespace: monitor
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: monitor
+  name: grafana-sidecar-role
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list", "create", "update", "patch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: grafana-sidecar-rolebinding
+  namespace: monitor
+subjects:
+- kind: ServiceAccount
+  name: grafana-sidecar-sa
+  namespace: monitor
+roleRef:
+  kind: Role
+  name: grafana-sidecar-role
+  apiGroup: rbac.authorization.k8s.io
